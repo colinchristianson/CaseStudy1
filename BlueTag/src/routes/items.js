@@ -30,17 +30,20 @@ function searchItems({ q, category, kind }) {
     JOIN users ON users.id = items.user_id
     WHERE items.status != 'removed'
   `;
-
+  const params[];
   if (q) {
     sql += ` AND items.title || ' ' || items.description || ' ' || items.location LIKE '%${q}%'`;
+    params.push(`%${escaped}%`);
   }
 
   if (category && category !== "all") {
     sql += ` AND items.category = '${category}'`;
+    params.push(category);
   }
 
   if (kind && kind !== "all") {
     sql += ` AND items.kind = '${kind}'`;
+    params.push(kind);
   }
 
   sql += " ORDER BY items.created_at DESC LIMIT 50";
