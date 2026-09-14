@@ -30,9 +30,10 @@ function searchItems({ q, category, kind }) {
     JOIN users ON users.id = items.user_id
     WHERE items.status != 'removed'
   `;
-  const params[];
+  const params = [];
   if (q) {
-    sql += ` AND items.title || ' ' || items.description || ' ' || items.location LIKE '%${q}%'`;
+    sql += ` AND items.title || ' ' || items.description || ' ' || items.location LIKE ? ESCAPE '\\'`;
+    const escaped = q.replace(/[\\%_]/g, (c) => `\\${c}`);
     params.push(`%${escaped}%`);
   }
 
@@ -47,7 +48,7 @@ function searchItems({ q, category, kind }) {
   }
 
   sql += " ORDER BY items.created_at DESC LIMIT 50";
-  return db.prepare(sql).all();
+  return db.prepare(sql).all(...params);
 }
 
 router.get("/", (req, res) => {
